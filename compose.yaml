@@ -1,0 +1,62 @@
+# Только локальная демонстрация. Все опубликованные порты доступны только с этого компьютера.
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: case
+      POSTGRES_PASSWORD: case-demo-only
+      POSTGRES_DB: case02
+    volumes:
+      - db-data:/var/lib/postgresql/data
+      - ./schema/001-server.sql:/docker-entrypoint-initdb.d/001.sql:ro
+    healthcheck:
+      test: [CMD-SHELL, 'pg_isready -U case -d case02']
+      interval: 2s
+      timeout: 2s
+      retries: 30
+  provider:
+    build:
+      context: .
+      dockerfile: stand/Dockerfile
+    command: [uvicorn, 'stand.provider:app', --host, '0.0.0.0', --port, '8081', --no-access-log]
+    ports: ['127.0.0.1:8081:8081']
+    environment:
+      DEMO_KEY: local-demo-only
+      PROVIDER_KEY: provider-demo-only
+    healthcheck:
+      test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://localhost:8081/health')"]
+      interval: 2s
+      timeout: 2s
+      retries: 30
+  api:
+    build:
+      context: .
+      dockerfile: stand/Dockerfile
+    ports: ['127.0.0.1:8080:8080']
+    environment:
+      DATABASE_URL: postgresql://case:case-demo-only@db:5432/case02
+      PROVIDER_URL: http://provider:8081
+      DEMO_KEY: local-demo-only
+      PROVIDER_KEY: provider-demo-only
+    depends_on:
+      db: {condition: service_healthy}
+      provider: {condition: service_healthy}
+    healthcheck:
+      test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://localhost:8080/health')"]
+      interval: 2s
+      timeout: 2s
+      retries: 30
+  tests:
+    profiles: [test]
+    build:
+      context: .
+      dockerfile: stand/Dockerfile
+    environment:
+      API_URL: http://api:8080
+      PROVIDER_URL: http://provider:8081
+      DATABASE_URL: postgresql://case:case-demo-only@db:5432/case02
+    depends_on:
+      api: {condition: service_healthy}
+    command: [python, -m, pytest, -q, -p, 'no:cacheprovider', tests]
+volumes:
+  db-data:

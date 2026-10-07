@@ -1,0 +1,85 @@
+name: Проверка кейса и стенда
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Подготовить средства сборки
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq graphviz fonts-dejavu-core
+          pip install -r stand/requirements.txt
+      - name: Собрать контракты, схемы, доску и PDF
+        run: |
+          python tools/build.py
+          python tools/check.py
+      - name: Проверить настоящий запуск Compose и HTTP
+        run: |
+          docker compose up --build -d --wait
+          docker compose exec -T api python -m stand.scenario
+          docker compose --profile test run --rm tests | tee review/tests.txt
+        shell: bash --noprofile --norc -e -o pipefail {0}
+      - name: Подготовить комплект для просмотра
+        if: always()
+        run: |
+          mkdir -p review
+          docker compose logs --no-color > review/compose.log 2>&1 || true
+          python - <<'PY'
+          from pathlib import Path
+          import zipfile
+          with zipfile.ZipFile('review/source-and-output.zip','w',zipfile.ZIP_DEFLATED) as z:
+              for p in Path('.').rglob('*'):
+                  if p.is_file() and not any(x in p.parts for x in ('.git','review','__pycache__','.pytest_cache')):
+                      z.write(p)
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: case02-review
+          path: review/
+          retention-days: 7
+      - name: Остановить демонстрационные контейнеры
+        if: always()
+        run: docker compose down -v
+      - name: Проверить отсутствие несохранённых изменений в main
+        if: github.ref == 'refs/heads/main'
+        run: git diff --exit-code -- contracts diagrams planning portfolio
+  publish:
+    needs: verify
+    if: github.ref == 'refs/heads/case-development' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: case-development
+      - uses: actions/download-artifact@v4
+        with:
+          name: case02-review
+          path: review
+      - name: Сохранить созданные файлы только в ветку кейса
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import zipfile
+          with zipfile.ZipFile('review/source-and-output.zip') as z:
+              for name in z.namelist():
+                  if name.startswith(('contracts/','diagrams/','planning/','portfolio/')) and '..' not in Path(name).parts:
+                      z.extract(name,'.')
+          PY
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add contracts diagrams planning portfolio
+          git diff --cached --quiet || git commit -m 'Собрать проверенные контракты, схемы, доску и PDF'
+          git push origin HEAD:case-development

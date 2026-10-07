@@ -1,0 +1,45 @@
+# Демонстрационные HTTP-запросы. Значения {{...}} заменяются результатом предыдущего ответа.
+@base = http://localhost:8080
+@provider = http://localhost:8081
+
+### 1. Код для вымышленного пользователя
+POST {{base}}/v1/auth/challenges
+Content-Type: application/json
+
+{"email":"candidate@example.test"}
+
+### 2. Имитация почты: только стенд, не публичный API
+GET {{base}}/demo/mailbox/{{challengeId}}
+X-Demo-Key: local-demo-only
+
+### 3. Подтверждение входа и регистрации
+POST {{base}}/v1/auth/sessions
+Content-Type: application/json
+
+{"challengeId":"{{challengeId}}","code":"{{code}}","deviceLabel":"Телефон"}
+
+### 4. Создание платежа. Повторите с тем же ключом: новый платёж не появится.
+POST {{base}}/v1/payments
+Authorization: Bearer {{accessToken}}
+Idempotency-Key: example-payment-0001
+Content-Type: application/json
+
+{"planCode":"DEMO-30"}
+
+### 5. Имитировать успех, не отправляя деньги
+POST {{provider}}/demo/payments/{{paymentId}}
+X-Demo-Key: local-demo-only
+Content-Type: application/json
+
+{"status":"succeeded"}
+
+### 6. Имитировать уведомление. Можно повторить тот же eventId.
+POST {{base}}/v1/provider/notifications
+X-Provider-Key: provider-demo-only
+Content-Type: application/json
+
+{"eventId":"00000000-0000-4000-8000-000000000099","paymentId":"{{paymentId}}"}
+
+### 7. Права текущего владельца учётной записи
+GET {{base}}/v1/entitlements
+Authorization: Bearer {{accessToken}}
