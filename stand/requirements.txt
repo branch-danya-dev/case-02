@@ -9,3 +9,4 @@ PyYAML==6.0.2
 openapi-spec-validator==0.7.2
 reportlab==4.4.9
 PyMuPDF==1.26.7
+CairoSVG==2.7.1
