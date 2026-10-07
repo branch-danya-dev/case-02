@@ -1,0 +1,121 @@
+<b:definitions xmlns:b="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bd="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="DefWorkout" targetNamespace="urn:case02:workout">
+  <b:process id="WorkoutProcess" isExecutable="false">
+    <b:laneSet id="Lanes">
+      <b:lane id="UserLane" name="Пользователь">
+        <b:flowNodeRef>Start</b:flowNodeRef>
+        <b:flowNodeRef>Choose</b:flowNodeRef>
+        <b:flowNodeRef>Enter</b:flowNodeRef>
+        <b:flowNodeRef>Fix</b:flowNodeRef>
+      </b:lane>
+      <b:lane id="AppLane" name="Приложение на устройстве">
+        <b:flowNodeRef>Validate</b:flowNodeRef>
+        <b:flowNodeRef>Valid</b:flowNodeRef>
+        <b:flowNodeRef>Calculate</b:flowNodeRef>
+        <b:flowNodeRef>Save</b:flowNodeRef>
+        <b:flowNodeRef>End</b:flowNodeRef>
+      </b:lane>
+    </b:laneSet>
+    <b:startEvent id="Start" name="Начало" />
+    <b:task id="Choose" name="Выбрать тренировку" />
+    <b:task id="Enter" name="Указать факт" />
+    <b:task id="Validate" name="Проверить ввод" />
+    <b:exclusiveGateway id="Valid" name="Данные верны?" />
+    <b:task id="Fix" name="Исправить ввод" />
+    <b:task id="Calculate" name="Рассчитать оценку" />
+    <b:task id="Save" name="Сохранить запись" />
+    <b:endEvent id="End" name="Сохранено" />
+    <b:sequenceFlow id="Flow0" sourceRef="Start" targetRef="Choose" name="" />
+    <b:sequenceFlow id="Flow1" sourceRef="Choose" targetRef="Enter" name="" />
+    <b:sequenceFlow id="Flow2" sourceRef="Enter" targetRef="Validate" name="" />
+    <b:sequenceFlow id="Flow3" sourceRef="Validate" targetRef="Valid" name="" />
+    <b:sequenceFlow id="Flow4" sourceRef="Valid" targetRef="Fix" name="Нет" />
+    <b:sequenceFlow id="Flow5" sourceRef="Fix" targetRef="Validate" name="" />
+    <b:sequenceFlow id="Flow6" sourceRef="Valid" targetRef="Calculate" name="Да" />
+    <b:sequenceFlow id="Flow7" sourceRef="Calculate" targetRef="Save" name="" />
+    <b:sequenceFlow id="Flow8" sourceRef="Save" targetRef="End" name="" />
+  </b:process>
+  <b:collaboration id="Collab">
+    <b:participant id="Pool" name="Локальная запись тренировки" processRef="WorkoutProcess" />
+  </b:collaboration>
+  <bd:BPMNDiagram id="Diagram">
+    <bd:BPMNPlane id="Plane" bpmnElement="Collab">
+      <bd:BPMNShape id="ShapePool" bpmnElement="Pool">
+        <dc:Bounds x="0" y="0" width="1200" height="370" />
+      </bd:BPMNShape>
+      <bd:BPMNShape id="ShapeUserLane" bpmnElement="UserLane">
+        <dc:Bounds x="30" y="0" width="1170" height="190" />
+      </bd:BPMNShape>
+      <bd:BPMNShape id="ShapeAppLane" bpmnElement="AppLane">
+        <dc:Bounds x="30" y="190" width="1170" height="180" />
+      </bd:BPMNShape>
+      <bd:BPMNShape id="ShapeStart" bpmnElement="Start">
+        <dc:Bounds x="80" y="90" width="32" height="32" />
+      </bd:BPMNShape>
+      <bd:BPMNShape id="ShapeChoose" bpmnElement="Choose">
+        <dc:Bounds x="150" y="65" width="155" height="70" />
+      </bd:BPMNShape>
+      <bd:BPMNShape id="ShapeEnter" bpmnElement="Enter">
+        <dc:Bounds x="350" y="65" width="140" height="70" />
+      </bd:BPMNShape>
+      <bd:BPMNShape id="ShapeValidate" bpmnElement="Validate">
+        <dc:Bounds x="350" y="230" width="140" height="70" />
+      </bd:BPMNShape>
+      <bd:BPMNShape id="ShapeValid" bpmnElement="Valid">
+        <dc:Bounds x="560" y="240" width="50" height="50" />
+      </bd:BPMNShape>
+      <bd:BPMNShape id="ShapeFix" bpmnElement="Fix">
+        <dc:Bounds x="720" y="65" width="150" height="70" />
+      </bd:BPMNShape>
+      <bd:BPMNShape id="ShapeCalculate" bpmnElement="Calculate">
+        <dc:Bounds x="700" y="230" width="160" height="70" />
+      </bd:BPMNShape>
+      <bd:BPMNShape id="ShapeSave" bpmnElement="Save">
+        <dc:Bounds x="900" y="230" width="155" height="70" />
+      </bd:BPMNShape>
+      <bd:BPMNShape id="ShapeEnd" bpmnElement="End">
+        <dc:Bounds x="1110" y="250" width="32" height="32" />
+      </bd:BPMNShape>
+      <bd:BPMNEdge id="Edge0" bpmnElement="Flow0">
+        <di:waypoint x="112" y="106" />
+        <di:waypoint x="150" y="106" />
+      </bd:BPMNEdge>
+      <bd:BPMNEdge id="Edge1" bpmnElement="Flow1">
+        <di:waypoint x="305" y="100" />
+        <di:waypoint x="350" y="100" />
+      </bd:BPMNEdge>
+      <bd:BPMNEdge id="Edge2" bpmnElement="Flow2">
+        <di:waypoint x="420" y="135" />
+        <di:waypoint x="420" y="230" />
+      </bd:BPMNEdge>
+      <bd:BPMNEdge id="Edge3" bpmnElement="Flow3">
+        <di:waypoint x="490" y="265" />
+        <di:waypoint x="560" y="265" />
+      </bd:BPMNEdge>
+      <bd:BPMNEdge id="Edge4" bpmnElement="Flow4">
+        <di:waypoint x="585" y="240" />
+        <di:waypoint x="585" y="165" />
+        <di:waypoint x="795" y="165" />
+        <di:waypoint x="795" y="135" />
+      </bd:BPMNEdge>
+      <bd:BPMNEdge id="Edge5" bpmnElement="Flow5">
+        <di:waypoint x="720" y="100" />
+        <di:waypoint x="640" y="100" />
+        <di:waypoint x="640" y="205" />
+        <di:waypoint x="420" y="205" />
+        <di:waypoint x="420" y="230" />
+      </bd:BPMNEdge>
+      <bd:BPMNEdge id="Edge6" bpmnElement="Flow6">
+        <di:waypoint x="610" y="265" />
+        <di:waypoint x="700" y="265" />
+      </bd:BPMNEdge>
+      <bd:BPMNEdge id="Edge7" bpmnElement="Flow7">
+        <di:waypoint x="860" y="265" />
+        <di:waypoint x="900" y="265" />
+      </bd:BPMNEdge>
+      <bd:BPMNEdge id="Edge8" bpmnElement="Flow8">
+        <di:waypoint x="1055" y="265" />
+        <di:waypoint x="1110" y="265" />
+      </bd:BPMNEdge>
+    </bd:BPMNPlane>
+  </bd:BPMNDiagram>
+</b:definitions>

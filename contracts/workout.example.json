@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "workoutId": "00000000-0000-4000-8000-000000000001",
+  "revision": 1,
+  "recordedAt": "2026-10-08T10:00:00+03:00",
+  "activity": "walking",
+  "environment": "treadmill",
+  "durationSeconds": 1800,
+  "weightKgAtWorkout": 96,
+  "segments": [
+    {
+      "durationSeconds": 300,
+      "speedKmh": 5,
+      "inclinePercent": 0
+    },
+    {
+      "durationSeconds": 1500,
+      "speedKmh": 6,
+      "inclinePercent": 5
+    }
+  ],
+  "actual": true
+}

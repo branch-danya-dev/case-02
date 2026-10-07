@@ -1,0 +1,12 @@
+{
+  "calculationId": "00000000-0000-4000-8000-000000000002",
+  "workoutId": "00000000-0000-4000-8000-000000000001",
+  "sourceRevision": 1,
+  "methodVersion": "synthetic-structure-test-1",
+  "inputWeightKg": 96,
+  "activeKcal": 100,
+  "restingKcal": 20,
+  "totalKcal": 120,
+  "warning": "Произвольные числа для проверки структуры, не оценка расхода энергии",
+  "syntheticFixture": true
+}

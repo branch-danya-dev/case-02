@@ -1,0 +1,3 @@
+digraph G {rankdir=LR;graph [bgcolor="white",pad="0.25",ranksep="0.5"]; node [shape=box,style="rounded,filled",fillcolor="#EDF4F8",fontname="DejaVu Sans",fontsize=14,margin="0.18,0.12"]; edge [fontname="DejaVu Sans",fontsize=11,color="#466079"];
+        a[label="creating\nИсход создания неизвестен"];p[label="pending\nОплата не подтверждена"];s[label="succeeded\nУспех подтверждён"];c[label="canceled\nОтмена"];r[label="refunded\nПолный возврат"];
+        a->p[label="Создание подтверждено"];a->a[label="Повтор с тем же ключом"];p->s[label="Доверенная сверка"];p->c[label="Отмена подтверждена"];s->r[label="Возврат подтверждён"];a->s[style=dashed,label="Сверка после потери ответа"];a->c[style=dashed];p->r[style=dashed,label="Пропущен успех"];a->r[style=dashed];}
