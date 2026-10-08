@@ -16,13 +16,18 @@ def main():
     assets.dump('интерфейсы/тренировка.пример.json',examples['WORKOUT'])
     assets.dump('интерфейсы/расчёт.пример.json',examples['ESTIMATE'])
     assets.diagrams()
-    # Финальная отрисовка: прежний промежуточный PNG не сохранял SVG-маркеры стрелок.
-    # Увеличиваем только подписи; сами сообщения и порядок не меняются.
+    # Финальная отрисовка сохраняет стрелки и оставляет место длинным русским подписям.
     path=ROOT/'схемы/последовательность-оплаты.svg'
     root=ET.fromstring(path.read_text(encoding='utf-8'))
     ET.register_namespace('','http://www.w3.org/2000/svg')
+    root.set('width','790')
+    root.set('viewBox','-15 0 790 610')
     for node in root.iter():
-        if node.tag.endswith('text'):
+        if node.tag.endswith('rect') and node.get('width')=='760':
+            node.set('x','-15');node.set('width','790')
+        elif node.tag.endswith('rect') and node.get('width')=='130' and node.get('y')=='15':
+            node.set('x',str(int(node.get('x'))-17));node.set('width','164')
+        elif node.tag.endswith('text'):
             if node.get('font-size')=='14': node.set('font-size','18')
             elif node.get('font-size')=='17': node.set('font-size','19')
     svg=ET.tostring(root,encoding='unicode')
