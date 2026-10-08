@@ -8,7 +8,7 @@ services:
       POSTGRES_DB: case02
     volumes:
       - db-data:/var/lib/postgresql/data
-      - ./schema/001-server.sql:/docker-entrypoint-initdb.d/001.sql:ro
+      - ./данные/001-сервер.sql:/docker-entrypoint-initdb.d/001.sql:ro
     healthcheck:
       test: [CMD-SHELL, 'pg_isready -U case -d case02']
       interval: 2s
@@ -17,8 +17,8 @@ services:
   provider:
     build:
       context: .
-      dockerfile: stand/Dockerfile
-    command: [uvicorn, 'stand.provider:app', --host, '0.0.0.0', --port, '8081', --no-access-log]
+      dockerfile: стенд/Dockerfile
+    command: [uvicorn, 'стенд.имитатор:app', --host, '0.0.0.0', --port, '8081', --no-access-log]
     ports: ['127.0.0.1:8081:8081']
     environment:
       DEMO_KEY: local-demo-only
@@ -31,7 +31,7 @@ services:
   api:
     build:
       context: .
-      dockerfile: stand/Dockerfile
+      dockerfile: стенд/Dockerfile
     ports: ['127.0.0.1:8080:8080']
     environment:
       DATABASE_URL: postgresql://case:case-demo-only@db:5432/case02
@@ -50,13 +50,13 @@ services:
     profiles: [test]
     build:
       context: .
-      dockerfile: stand/Dockerfile
+      dockerfile: стенд/Dockerfile
     environment:
       API_URL: http://api:8080
       PROVIDER_URL: http://provider:8081
       DATABASE_URL: postgresql://case:case-demo-only@db:5432/case02
     depends_on:
       api: {condition: service_healthy}
-    command: [python, -m, pytest, -q, -p, 'no:cacheprovider', tests]
+    command: [python, -m, pytest, -q, -p, 'no:cacheprovider', проверки]
 volumes:
   db-data:

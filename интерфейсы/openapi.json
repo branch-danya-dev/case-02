@@ -1,0 +1,1383 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "Кейс 02: регистрация, оплата и доступ",
+    "description": "Исполняемая демонстрация проектируемого контракта. Не принимает настоящие платежи. Тренировочные данные API не принимает.",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/v1/auth/challenges": {
+      "post": {
+        "tags": [
+          "Вход"
+        ],
+        "summary": "Запросить код входа или регистрации",
+        "operationId": "requestChallenge",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChallengeIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "description": "Запрос принят; результат следует уточнить",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChallengeOut"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Некорректный запрос",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Необходим действующий сеанс",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Доступ запрещён",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Запись не найдена или недоступна",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Конфликт состояния или повторного запроса",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Недопустимые входные данные",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Превышена частота запросов",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Сервис временно недоступен",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/auth/sessions": {
+      "post": {
+        "tags": [
+          "Вход"
+        ],
+        "summary": "Подтвердить код и открыть сеанс на устройстве",
+        "operationId": "openSession",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Запись создана",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionOut"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Некорректный запрос",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Необходим действующий сеанс",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Доступ запрещён",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Запись не найдена или недоступна",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Конфликт состояния или повторного запроса",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Недопустимые входные данные",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Превышена частота запросов",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Сервис временно недоступен",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/auth/sessions/current": {
+      "delete": {
+        "tags": [
+          "Вход"
+        ],
+        "summary": "Завершить текущий сеанс",
+        "operationId": "closeSession",
+        "responses": {
+          "204": {
+            "description": "Операция выполнена, тело ответа отсутствует"
+          },
+          "400": {
+            "description": "Некорректный запрос",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Необходим действующий сеанс",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Доступ запрещён",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Запись не найдена или недоступна",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Конфликт состояния или повторного запроса",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Недопустимые входные данные",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Превышена частота запросов",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Сервис временно недоступен",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/v1/me": {
+      "get": {
+        "tags": [
+          "Вход"
+        ],
+        "summary": "Получить свою учётную запись",
+        "operationId": "getAccount",
+        "responses": {
+          "200": {
+            "description": "Операция выполнена",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountOut"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Некорректный запрос",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Необходим действующий сеанс",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Доступ запрещён",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Запись не найдена или недоступна",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Конфликт состояния или повторного запроса",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Недопустимые входные данные",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Превышена частота запросов",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Сервис временно недоступен",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/v1/plans": {
+      "get": {
+        "tags": [
+          "Оплата"
+        ],
+        "summary": "Получить условные тарифы",
+        "operationId": "listPlans",
+        "responses": {
+          "200": {
+            "description": "Операция выполнена",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/Plan"
+                  },
+                  "type": "array",
+                  "title": "Ответ операции API"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Некорректный запрос",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Необходим действующий сеанс",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Доступ запрещён",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Запись не найдена или недоступна",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Конфликт состояния или повторного запроса",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Недопустимые входные данные",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Превышена частота запросов",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Сервис временно недоступен",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/payments": {
+      "post": {
+        "tags": [
+          "Оплата"
+        ],
+        "summary": "Создать или повторить запрос оплаты",
+        "operationId": "createPayment",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 64,
+              "title": "Ключ повторяемости запроса"
+            },
+            "description": "Ключ повторяемости запроса"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PaymentIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Запрос принят; результат следует уточнить",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentOut"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Некорректный запрос"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Необходим действующий сеанс"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Доступ запрещён"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Запись не найдена или недоступна"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Конфликт состояния или повторного запроса"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Недопустимые входные данные"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Превышена частота запросов"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Сервис временно недоступен"
+          }
+        }
+      }
+    },
+    "/v1/payments/{payment_id}": {
+      "get": {
+        "tags": [
+          "Оплата"
+        ],
+        "summary": "Получить состояние своего платежа",
+        "operationId": "getPayment",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "payment_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Идентификатор платежа"
+            },
+            "description": "Идентификатор платежа"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Операция выполнена",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentOut"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Некорректный запрос"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Необходим действующий сеанс"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Доступ запрещён"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Запись не найдена или недоступна"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Конфликт состояния или повторного запроса"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Недопустимые входные данные"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Превышена частота запросов"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Сервис временно недоступен"
+          }
+        }
+      }
+    },
+    "/v1/provider/notifications": {
+      "post": {
+        "tags": [
+          "Интеграция"
+        ],
+        "summary": "Получить сигнал платёжной системы и проверить его",
+        "operationId": "acceptNotification",
+        "parameters": [
+          {
+            "name": "X-Provider-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Ключ проверки платёжного сервиса"
+            },
+            "description": "Ключ проверки платёжного сервиса"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Notification"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Операция выполнена",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Ack"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Некорректный запрос"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Необходим действующий сеанс"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Доступ запрещён"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Запись не найдена или недоступна"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Конфликт состояния или повторного запроса"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Недопустимые входные данные"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Превышена частота запросов"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Сервис временно недоступен"
+          }
+        }
+      }
+    },
+    "/v1/entitlements": {
+      "get": {
+        "tags": [
+          "Подписка"
+        ],
+        "summary": "Получить свои права доступа на текущий момент",
+        "operationId": "getEntitlements",
+        "responses": {
+          "200": {
+            "description": "Операция выполнена",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Entitlement"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Некорректный запрос",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Необходим действующий сеанс",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Доступ запрещён",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Запись не найдена или недоступна",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Конфликт состояния или повторного запроса",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Недопустимые входные данные",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Превышена частота запросов",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Сервис временно недоступен",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AccountOut": {
+        "properties": {
+          "accountId": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Идентификатор учётной записи",
+            "description": "Идентификатор учётной записи. Идентификатор поля в формате обмена: accountId."
+          },
+          "email": {
+            "type": "string",
+            "title": "Адрес электронной почты",
+            "description": "Адрес электронной почты. Идентификатор поля в формате обмена: email."
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "accountId",
+          "email"
+        ],
+        "title": "Учётная запись"
+      },
+      "Ack": {
+        "properties": {
+          "accepted": {
+            "type": "boolean",
+            "title": "Уведомление принято",
+            "description": "Уведомление принято. Идентификатор поля в формате обмена: accepted.",
+            "default": true
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "Подтверждение обработки"
+      },
+      "ChallengeIn": {
+        "properties": {
+          "email": {
+            "type": "string",
+            "maxLength": 254,
+            "minLength": 3,
+            "pattern": "^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$",
+            "title": "Адрес электронной почты",
+            "description": "Адрес электронной почты. Идентификатор поля в формате обмена: email."
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "email"
+        ],
+        "title": "Запрос кода входа"
+      },
+      "ChallengeOut": {
+        "properties": {
+          "challengeId": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Идентификатор запроса кода входа",
+            "description": "Идентификатор запроса кода входа. Идентификатор поля в формате обмена: challengeId."
+          },
+          "expiresInSeconds": {
+            "type": "integer",
+            "title": "Срок действия в секундах",
+            "description": "Срок действия в секундах. Идентификатор поля в формате обмена: expiresInSeconds."
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "challengeId",
+          "expiresInSeconds"
+        ],
+        "title": "Выданный запрос кода"
+      },
+      "Entitlement": {
+        "properties": {
+          "accountId": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Идентификатор учётной записи",
+            "description": "Идентификатор учётной записи. Идентификатор поля в формате обмена: accountId."
+          },
+          "paid": {
+            "type": "boolean",
+            "title": "Платный доступ действует",
+            "description": "Платный доступ действует. Идентификатор поля в формате обмена: paid."
+          },
+          "activeUntil": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Окончание непрерывного оплаченного периода",
+            "description": "Окончание непрерывного оплаченного периода. Идентификатор поля в формате обмена: activeUntil."
+          },
+          "features": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Доступные функции",
+            "description": "Доступные функции. Идентификатор поля в формате обмена: features."
+          },
+          "proofKind": {
+            "type": "string",
+            "const": "unsigned-demo",
+            "title": "Вид подтверждения доступа",
+            "description": "Вид подтверждения доступа. Идентификатор поля в формате обмена: proofKind. Допустимые обозначения: unsigned-demo — Демонстрационное подтверждение без криптографической подписи.",
+            "default": "unsigned-demo"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "accountId",
+          "paid",
+          "activeUntil",
+          "features"
+        ],
+        "title": "Права доступа"
+      },
+      "Error": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "title": "Код",
+            "description": "Код. Идентификатор поля в формате обмена: code."
+          },
+          "message": {
+            "type": "string",
+            "title": "Сообщение для пользователя",
+            "description": "Сообщение для пользователя. Идентификатор поля в формате обмена: message."
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "code",
+          "message"
+        ],
+        "title": "Ошибка операции"
+      },
+      "LoginIn": {
+        "properties": {
+          "challengeId": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Идентификатор запроса кода входа",
+            "description": "Идентификатор запроса кода входа. Идентификатор поля в формате обмена: challengeId."
+          },
+          "code": {
+            "type": "string",
+            "pattern": "^\\d{6}$",
+            "title": "Код",
+            "description": "Код. Идентификатор поля в формате обмена: code."
+          },
+          "deviceLabel": {
+            "type": "string",
+            "maxLength": 60,
+            "minLength": 1,
+            "title": "Название устройства",
+            "description": "Название устройства. Идентификатор поля в формате обмена: deviceLabel."
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "challengeId",
+          "code",
+          "deviceLabel"
+        ],
+        "title": "Подтверждение входа"
+      },
+      "Notification": {
+        "properties": {
+          "eventId": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Идентификатор уведомления",
+            "description": "Идентификатор уведомления. Идентификатор поля в формате обмена: eventId."
+          },
+          "paymentId": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Идентификатор платежа",
+            "description": "Идентификатор платежа. Идентификатор поля в формате обмена: paymentId."
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "eventId",
+          "paymentId"
+        ],
+        "title": "Платёжное уведомление"
+      },
+      "PaymentIn": {
+        "properties": {
+          "planCode": {
+            "type": "string",
+            "maxLength": 40,
+            "minLength": 1,
+            "title": "Код тарифа",
+            "description": "Код тарифа. Идентификатор поля в формате обмена: planCode."
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "planCode"
+        ],
+        "title": "Создание оплаты"
+      },
+      "PaymentOut": {
+        "properties": {
+          "paymentId": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Идентификатор платежа",
+            "description": "Идентификатор платежа. Идентификатор поля в формате обмена: paymentId."
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "creating",
+              "pending",
+              "succeeded",
+              "canceled",
+              "refunded"
+            ],
+            "title": "Состояние",
+            "description": "Состояние. Идентификатор поля в формате обмена: status. Допустимые обозначения: creating — Исход создания неизвестен; pending — Ожидает оплаты; succeeded — Оплата подтверждена; canceled — Платёж отменён; refunded — Полный возврат."
+          },
+          "amountMinor": {
+            "type": "integer",
+            "title": "Сумма в минимальных денежных единицах",
+            "description": "Сумма в минимальных денежных единицах. Идентификатор поля в формате обмена: amountMinor."
+          },
+          "currency": {
+            "type": "string",
+            "title": "Код валюты",
+            "description": "Код валюты. Идентификатор поля в формате обмена: currency."
+          },
+          "checkoutUrl": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Адрес страницы оплаты",
+            "description": "Адрес страницы оплаты. Идентификатор поля в формате обмена: checkoutUrl."
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "paymentId",
+          "status",
+          "amountMinor",
+          "currency",
+          "checkoutUrl"
+        ],
+        "title": "Состояние платежа"
+      },
+      "Plan": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "title": "Код",
+            "description": "Код. Идентификатор поля в формате обмена: code."
+          },
+          "amountMinor": {
+            "type": "integer",
+            "exclusiveMinimum": 0.0,
+            "title": "Сумма в минимальных денежных единицах",
+            "description": "Сумма в минимальных денежных единицах. Идентификатор поля в формате обмена: amountMinor."
+          },
+          "currency": {
+            "type": "string",
+            "const": "RUB",
+            "title": "Код валюты",
+            "description": "Код валюты. Идентификатор поля в формате обмена: currency. Допустимые обозначения: RUB — Российский рубль."
+          },
+          "durationSeconds": {
+            "type": "integer",
+            "exclusiveMinimum": 0.0,
+            "title": "Длительность в секундах",
+            "description": "Длительность в секундах. Идентификатор поля в формате обмена: durationSeconds."
+          },
+          "automaticRenewal": {
+            "type": "boolean",
+            "const": false,
+            "title": "Автоматическое продление",
+            "description": "Автоматическое продление. Идентификатор поля в формате обмена: automaticRenewal.",
+            "default": false
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "code",
+          "amountMinor",
+          "currency",
+          "durationSeconds"
+        ],
+        "title": "Тариф"
+      },
+      "SessionOut": {
+        "properties": {
+          "accountId": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Идентификатор учётной записи",
+            "description": "Идентификатор учётной записи. Идентификатор поля в формате обмена: accountId."
+          },
+          "accessToken": {
+            "type": "string",
+            "title": "Ключ доступа к сеансу",
+            "description": "Ключ доступа к сеансу. Идентификатор поля в формате обмена: accessToken."
+          },
+          "tokenType": {
+            "type": "string",
+            "const": "Bearer",
+            "title": "Способ передачи ключа доступа",
+            "description": "Способ передачи ключа доступа. Идентификатор поля в формате обмена: tokenType. Допустимые обозначения: Bearer — Ключ доступа в заголовке Authorization.",
+            "default": "Bearer"
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Момент окончания действия",
+            "description": "Момент окончания действия. Идентификатор поля в формате обмена: expiresAt."
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "accountId",
+          "accessToken",
+          "expiresAt"
+        ],
+        "title": "Открытый сеанс"
+      }
+    },
+    "securitySchemes": {
+      "HTTPBearer": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "Ключ сеанса передаётся в заголовке Authorization: Bearer <ключ>. Значение не публикуется в журнале."
+      }
+    }
+  }
+}

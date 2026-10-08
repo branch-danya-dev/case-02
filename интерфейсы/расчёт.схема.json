@@ -1,0 +1,78 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "calculationId": {
+      "description": "Идентификатор расчёта. Идентификатор поля в формате обмена: calculationId.",
+      "format": "uuid",
+      "title": "Идентификатор расчёта",
+      "type": "string"
+    },
+    "workoutId": {
+      "description": "Идентификатор тренировки. Идентификатор поля в формате обмена: workoutId.",
+      "format": "uuid",
+      "title": "Идентификатор тренировки",
+      "type": "string"
+    },
+    "sourceRevision": {
+      "description": "Редакция исходной тренировки. Идентификатор поля в формате обмена: sourceRevision.",
+      "minimum": 1,
+      "title": "Редакция исходной тренировки",
+      "type": "integer"
+    },
+    "methodVersion": {
+      "description": "Версия метода расчёта. Идентификатор поля в формате обмена: methodVersion.",
+      "minLength": 1,
+      "title": "Версия метода расчёта",
+      "type": "string"
+    },
+    "inputWeightKg": {
+      "description": "Масса для расчёта в килограммах. Идентификатор поля в формате обмена: inputWeightKg.",
+      "exclusiveMinimum": 0,
+      "title": "Масса для расчёта в килограммах",
+      "type": "number"
+    },
+    "activeKcal": {
+      "description": "Активные энергозатраты в килокалориях. Идентификатор поля в формате обмена: activeKcal.",
+      "minimum": 0,
+      "title": "Активные энергозатраты в килокалориях",
+      "type": "number"
+    },
+    "restingKcal": {
+      "description": "Фоновые энергозатраты в килокалориях. Идентификатор поля в формате обмена: restingKcal.",
+      "minimum": 0,
+      "title": "Фоновые энергозатраты в килокалориях",
+      "type": "number"
+    },
+    "totalKcal": {
+      "description": "Общие энергозатраты в килокалориях. Идентификатор поля в формате обмена: totalKcal.",
+      "minimum": 0,
+      "title": "Общие энергозатраты в килокалориях",
+      "type": "number"
+    },
+    "warning": {
+      "description": "Предупреждение об ограничениях. Идентификатор поля в формате обмена: warning.",
+      "title": "Предупреждение об ограничениях",
+      "type": "string"
+    },
+    "syntheticFixture": {
+      "const": true,
+      "default": true,
+      "description": "Признак вымышленного проверочного примера. Идентификатор поля в формате обмена: syntheticFixture.",
+      "title": "Признак вымышленного проверочного примера",
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "calculationId",
+    "workoutId",
+    "sourceRevision",
+    "methodVersion",
+    "inputWeightKg",
+    "activeKcal",
+    "restingKcal",
+    "totalKcal",
+    "warning"
+  ],
+  "title": "Результат расчёта",
+  "type": "object"
+}

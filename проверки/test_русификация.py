@@ -50,3 +50,14 @@ def test_schema_captions_are_russian():
 def test_russian_structure_and_reference():
     assert all(not (ROOT/p).exists() for p in ['docs','contracts','diagrams','planning','portfolio','schema','stand','tests','tools'])
     assert all((ROOT/p).is_file() for p in ['интерфейсы/README.md','планирование/доска.html','представление/Рогулин-Даниил-кейс-02.pdf','сборка/собрать.py','проверки/проверить.py'])
+
+
+def test_parameter_captions_are_russian():
+    for item in app.openapi()['paths'].values():
+        for operation in item.values():
+            if not isinstance(operation,dict): continue
+            for parameter in operation.get('parameters',[]):
+                name=parameter['name']
+                assert name in FIELDS
+                assert parameter['schema']['title']==FIELDS[name]
+                assert re.search('[А-Яа-яЁё]',parameter['description'])

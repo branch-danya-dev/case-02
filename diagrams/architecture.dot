@@ -1,6 +1,0 @@
-digraph G { rankdir=TB; graph [bgcolor="white",pad="0.25",ranksep="0.5"]; node [shape=box,style="rounded,filled",fillcolor="#EDF4F8",fontname="DejaVu Sans",fontsize=14,margin="0.18,0.12"]; edge [fontname="DejaVu Sans",fontsize=11,color="#466079"];
-        subgraph cluster_local {label="УСТРОЙСТВО ВЛАДЕЛЬЦА";fontname="DejaVu Sans";color="#9DB4C5";
-        ui[label="Интерфейс приложения"]; calc[label="Дневник и расчёты\nЛокальные версии данных"]; model[label="3D-визуализация\nФото только на устройстве"];ui->calc;calc->model;}
-        subgraph cluster_server {label="СЕРВЕР ДОСТУПА";fontname="DejaVu Sans";color="#9DB4C5";
-        api[label="Регистрация и подписка"];db[label="PostgreSQL\nАккаунты, платежи, периоды",shape=cylinder];api->db;}
-        pay[label="Внешний платёжный сервис\nВ стенде — имитатор"];ui->api[label="Вход и право доступа\nБез дневника и фото"];api->pay[label="Создание и сверка оплаты"];pay->api[label="Уведомление",style=dashed];}

@@ -1,0 +1,138 @@
+{
+  "$defs": {
+    "Segment": {
+      "additionalProperties": false,
+      "properties": {
+        "durationSeconds": {
+          "description": "Длительность в секундах. Идентификатор поля в формате обмена: durationSeconds.",
+          "exclusiveMinimum": 0,
+          "maximum": 86400,
+          "title": "Длительность в секундах",
+          "type": "integer"
+        },
+        "speedKmh": {
+          "description": "Скорость в километрах в час. Идентификатор поля в формате обмена: speedKmh.",
+          "exclusiveMinimum": 0,
+          "maximum": 40,
+          "title": "Скорость в километрах в час",
+          "type": "number"
+        },
+        "inclinePercent": {
+          "description": "Уклон в процентах. Идентификатор поля в формате обмена: inclinePercent.",
+          "maximum": 40,
+          "minimum": -30,
+          "title": "Уклон в процентах",
+          "type": "number"
+        }
+      },
+      "required": [
+        "durationSeconds",
+        "speedKmh",
+        "inclinePercent"
+      ],
+      "title": "Отрезок тренировки",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schemaVersion": {
+      "const": 1,
+      "default": 1,
+      "description": "Версия формата записи. Идентификатор поля в формате обмена: schemaVersion.",
+      "title": "Версия формата записи",
+      "type": "integer"
+    },
+    "workoutId": {
+      "description": "Идентификатор тренировки. Идентификатор поля в формате обмена: workoutId.",
+      "format": "uuid",
+      "title": "Идентификатор тренировки",
+      "type": "string"
+    },
+    "revision": {
+      "description": "Номер редакции. Идентификатор поля в формате обмена: revision.",
+      "minimum": 1,
+      "title": "Номер редакции",
+      "type": "integer"
+    },
+    "recordedAt": {
+      "description": "Время записи с часовым поясом. Идентификатор поля в формате обмена: recordedAt.",
+      "format": "date-time",
+      "title": "Время записи с часовым поясом",
+      "type": "string"
+    },
+    "activity": {
+      "description": "Вид тренировки. Идентификатор поля в формате обмена: activity. Допустимые обозначения: walking — Ходьба; running — Бег.",
+      "enum": [
+        "walking",
+        "running"
+      ],
+      "title": "Вид тренировки",
+      "type": "string"
+    },
+    "environment": {
+      "description": "Условия тренировки. Идентификатор поля в формате обмена: environment. Допустимые обозначения: treadmill — Беговая дорожка; outdoor — На улице.",
+      "enum": [
+        "treadmill",
+        "outdoor"
+      ],
+      "title": "Условия тренировки",
+      "type": "string"
+    },
+    "durationSeconds": {
+      "description": "Длительность в секундах. Идентификатор поля в формате обмена: durationSeconds.",
+      "exclusiveMinimum": 0,
+      "maximum": 86400,
+      "title": "Длительность в секундах",
+      "type": "integer"
+    },
+    "segments": {
+      "description": "Отрезки с постоянными параметрами. Идентификатор поля в формате обмена: segments.",
+      "items": {
+        "$ref": "#/$defs/Segment"
+      },
+      "maxItems": 1000,
+      "title": "Отрезки с постоянными параметрами",
+      "type": "array"
+    },
+    "distanceMeters": {
+      "anyOf": [
+        {
+          "exclusiveMinimum": 0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Расстояние в метрах. Идентификатор поля в формате обмена: distanceMeters.",
+      "title": "Расстояние в метрах"
+    },
+    "weightKgAtWorkout": {
+      "description": "Масса во время тренировки в килограммах. Идентификатор поля в формате обмена: weightKgAtWorkout.",
+      "exclusiveMinimum": 0,
+      "maximum": 500,
+      "title": "Масса во время тренировки в килограммах",
+      "type": "number"
+    },
+    "actual": {
+      "const": true,
+      "default": true,
+      "description": "Признак фактически выполненной тренировки. Идентификатор поля в формате обмена: actual.",
+      "title": "Признак фактически выполненной тренировки",
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "workoutId",
+    "revision",
+    "recordedAt",
+    "activity",
+    "environment",
+    "durationSeconds",
+    "weightKgAtWorkout"
+  ],
+  "title": "Локальная запись тренировки",
+  "type": "object"
+}
