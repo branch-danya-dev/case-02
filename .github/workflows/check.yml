@@ -6,42 +6,67 @@ permissions:
   contents: read
 jobs:
   verify:
+    name: Документы, русификация и работа стенда
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - name: Получить проверяемую версию
+        uses: actions/checkout@v4
+      - name: Подготовить Python
+        uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - name: Применить однократный перевод структуры
+        run: |
+          if [ -d docs ]; then
+            python служебное/русифицировать.py
+            python служебное/поправить_пути.py
+          fi
       - name: Подготовить средства сборки
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y -qq graphviz fonts-dejavu-core
-          pip install -r stand/requirements.txt
-      - name: Собрать контракты, схемы, доску и PDF
+          pip install -r стенд/requirements.txt
+      - name: Собрать описания, схемы, доску и PDF
         run: |
-          python tools/build.py
-          python tools/check.py
-      - name: Проверить настоящий запуск Compose и HTTP
+          python сборка/собрать.py
+          python проверки/проверить.py
+          python -m compileall -q стенд сборка проверки
+      - name: Проверить настоящий запуск Docker Compose и HTTP
         run: |
+          mkdir -p review
           docker compose up --build -d --wait
-          docker compose exec -T api python -m stand.scenario
-          docker compose --profile test run --rm tests | tee review/tests.txt
+          docker compose exec -T api python -m стенд.сценарий
+          docker compose --profile test run --rm tests | tee review/проверки.txt
         shell: bash --noprofile --norc -e -o pipefail {0}
-      - name: Подготовить комплект для просмотра
+      - name: Сохранить сведения для проверки
         if: always()
         run: |
           mkdir -p review
-          docker compose logs --no-color > review/compose.log 2>&1 || true
+          docker compose logs --no-color > review/контейнеры.log 2>&1 || true
           python - <<'PY'
           from pathlib import Path
-          import zipfile
-          with zipfile.ZipFile('review/source-and-output.zip','w',zipfile.ZIP_DEFLATED) as z:
-              for p in Path('.').rglob('*'):
+          import json,re,zipfile
+          root=Path('.')
+          prose=[]
+          for p in sorted(root.rglob('*.md')):
+              if any(x in p.parts for x in ('.git','review','служебное')):continue
+              for i,line in enumerate(p.read_text(encoding='utf-8').splitlines(),1):
+                  clean=re.sub(r'https?://[^\s)]+','',line)
+                  if re.search(r'\b(backlog|webhook|story points|endpoint|token|pending|creating|succeeded|canceled|refunded)\b',clean,re.I):
+                      prose.append(f'{p}:{i}: {line}')
+          Path('review/проверка-терминов.txt').write_text('\n'.join(prose),encoding='utf-8')
+          print('=== ОСТАВШИЕСЯ ТЕХНИЧЕСКИЕ ОБОЗНАЧЕНИЯ ===')
+          print('\n'.join(prose))
+          print('=== ФАЙЛЫ ===')
+          with zipfile.ZipFile('review/исходники-и-результат.zip','w',zipfile.ZIP_DEFLATED) as z:
+              for p in sorted(root.rglob('*')):
                   if p.is_file() and not any(x in p.parts for x in ('.git','review','__pycache__','.pytest_cache')):
                       z.write(p)
+                      print(p)
           PY
-      - uses: actions/upload-artifact@v4
+      - name: Сохранить комплект проверки
+        uses: actions/upload-artifact@v4
         if: always()
         with:
           name: case02-review
@@ -50,36 +75,46 @@ jobs:
       - name: Остановить демонстрационные контейнеры
         if: always()
         run: docker compose down -v
-      - name: Проверить отсутствие несохранённых изменений в main
+      - name: Проверить воспроизводимость файлов в main
         if: github.ref == 'refs/heads/main'
-        run: git diff --exit-code -- contracts diagrams planning portfolio
+        run: git diff --exit-code -- интерфейсы схемы планирование представление
   publish:
+    name: Сохранить перевод в проверочную ветку
     needs: verify
-    if: github.ref == 'refs/heads/case-development' && github.event_name == 'push'
+    if: github.ref == 'refs/heads/russification' && github.event_name == 'push'
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v4
+      - name: Получить исходную проверенную версию
+        uses: actions/checkout@v4
         with:
-          ref: case-development
-      - uses: actions/download-artifact@v4
+          ref: ${{ github.sha }}
+      - name: Получить результаты успешной проверки
+        uses: actions/download-artifact@v4
         with:
           name: case02-review
           path: review
-      - name: Сохранить созданные файлы только в ветку кейса
+      - name: Сохранить русские пути, тексты и созданные материалы
         run: |
+          git rm -r --ignore-unmatch contracts diagrams docs planning portfolio schema stand tests tools
           python - <<'PY'
           from pathlib import Path
           import zipfile
-          with zipfile.ZipFile('review/source-and-output.zip') as z:
+          root=Path('.').resolve()
+          allowed={'.github','.gitignore','.dockerignore','README.md','compose.yaml','служебное','документы','интерфейсы','схемы','планирование','представление','данные','стенд','проверки','сборка'}
+          with zipfile.ZipFile('review/исходники-и-результат.zip') as z:
               for name in z.namelist():
-                  if name.startswith(('contracts/','diagrams/','planning/','portfolio/')) and '..' not in Path(name).parts:
-                      z.extract(name,'.')
+                  p=Path(name)
+                  if p.is_absolute() or '..' in p.parts or not p.parts or p.parts[0] not in allowed:
+                      raise ValueError('Недопустимый путь в комплекте: '+name)
+                  target=(root/p).resolve()
+                  if not target.is_relative_to(root):raise ValueError(name)
+                  z.extract(name,root)
           PY
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add contracts diagrams planning portfolio
-          git diff --cached --quiet || git commit -m 'Собрать проверенные контракты, схемы, доску и PDF'
-          git push origin HEAD:case-development
+          git add -A -- README.md compose.yaml .dockerignore .gitignore .github служебное документы интерфейсы схемы планирование представление данные стенд проверки сборка
+          git diff --cached --quiet || git commit -m 'Русифицировать структуру, описания API, схемы, доску и PDF'
+          git push origin HEAD:russification
